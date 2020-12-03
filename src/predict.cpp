@@ -6,9 +6,9 @@
 
 using namespace cv;
 using std::vector;
-using std::priority_queue;
 
 constexpr char piece_names[] = "bknpqrBKNPQR";
+vector<vector<Mat>> images;
 
 void load_images(vector<vector<Mat>> & images)
 {
@@ -27,30 +27,6 @@ void load_images(vector<vector<Mat>> & images)
 		}
 		images.push_back(piece_imgs);
 	}
-}
-
-priority_queue<knn_piece> find_knn(const Mat & piece, const size_t k)
-{
-	priority_queue<knn_piece> neighbors;
-	static vector<vector<Mat>> images;
-	
-	if (images.size() == 0)
-		load_images(images);
-	for (size_t i = 0; i < strlen(piece_names); i++)
-	{
-		for (auto & img : images[i])
-		{
-			float dist = norm(piece, img);
-			if (neighbors.size() < k)
-				neighbors.push(knn_piece(piece_names[i], dist));
-			else if (neighbors.top().distance > dist)
-			{
-				neighbors.pop();
-				neighbors.push(knn_piece(piece_names[i], dist));
-			}
-		}
-	}
-	return (neighbors);
 }
 
 void removeFurthestPiece(std::multimap<char, float> & map)
@@ -75,27 +51,19 @@ void removeFurthestPiece(std::multimap<char, float> & map)
 	}
 }
 
-char classifyPiece(const Mat & piece)
+char getMajority(vector<knn_piece>::const_iterator start, vector<knn_piece>::const_iterator end)
 {
-	priority_queue<knn_piece> neighbors;
-
-	neighbors = find_knn(piece, 20);
-
 	std::multimap<char, float> map;
 
-	while (neighbors.size() != 0)
+	for (auto p = start; p != end; p++)
 	{
-#ifdef DEBUG
-		printf("%c, %f\n", neighbors.top().name, neighbors.top().distance);
-#endif
-		map.insert({neighbors.top().name, neighbors.top().distance});
-		neighbors.pop();
+		map.insert({p->name, p->distance});
 	}
-	
+
 	std::pair<char, size_t> majority = {'a', 0};
 	std::pair<char, size_t> majority2 = {'a', 0};
 
-	while (majority.second == majority2.second)
+	while (majority == majority2)
 	{
 		for (auto & c : piece_names)
 		{
@@ -108,5 +76,43 @@ char classifyPiece(const Mat & piece)
 		}
 		removeFurthestPiece(map);
 	}
+	if (majority == majority2)
+		return ('0');
 	return (majority.first);
+
+}
+
+int findOptimalK(const vector<knn_piece> & pieces)
+{
+	size_t k = 0;
+	bool isCorrectMajority = false;
+
+	while (!isCorrectMajority && k < 100)
+	{
+		k++;
+		if (getMajority(pieces.begin() + 1, pieces.begin() + 1 + k) == pieces[0].name)
+			isCorrectMajority = true;
+	}
+	return (k);
+}
+
+char classifyPiece(const Mat & piece)
+{
+
+	if (images.size() == 0)
+		load_images(images);
+
+	vector<knn_piece> pieces;
+
+	for (size_t i = 0; i < strlen(piece_names); i++)
+	{
+		for (auto & img : images[i])
+		{
+			pieces.push_back(knn_piece(piece_names[i], norm(piece, img)));
+		}
+	}
+	std::sort(pieces.begin(), pieces.end());
+
+	int k = findOptimalK(pieces);
+	return (getMajority(pieces.begin(), pieces.begin() + k));
 }
