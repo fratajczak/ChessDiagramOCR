@@ -10,7 +10,7 @@ class ImageLine
 {
   public:
     float theta;
-	float r;
+    float r;
     ImageLine(const float r, const float theta);
     ImageLine(const Point p1, const Point p2);
     Point center() const;

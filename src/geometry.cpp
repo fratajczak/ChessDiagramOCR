@@ -11,7 +11,7 @@ ImageLine::ImageLine(const float r, const float theta)
     p2 = Point(cvRound(x0 - alpha * (-sin_t)), cvRound(y0 - alpha * cos_t));
     p_center = Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
     this->theta = theta;
-	this->r = r;
+    this->r = r;
 }
 
 ImageLine::ImageLine(const Point p1, const Point p2)

@@ -1,13 +1,13 @@
-#include <utility>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
 #include "geometry.hpp"
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <utility>
 
 using namespace cv;
 using std::tie;
 using std::vector;
 
-void drawLines(Mat & image, const vector<ImageLine> &lines)
+void drawLines(Mat &image, const vector<ImageLine> &lines)
 {
     for (size_t i = 0; i < lines.size(); i++)
     {
@@ -17,7 +17,7 @@ void drawLines(Mat & image, const vector<ImageLine> &lines)
     }
 }
 
-void drawIntersections(Mat & image, const vector<vector<Point>> &intersections)
+void drawIntersections(Mat &image, const vector<vector<Point>> &intersections)
 {
     for (const vector<Point> &line : intersections)
     {
@@ -28,7 +28,8 @@ void drawIntersections(Mat & image, const vector<vector<Point>> &intersections)
     }
 }
 
-void drawPartition(Mat image, const vector<vector<Point>> & intersections, const vector<ImageLine> & hori_lines, const vector<ImageLine> & vert_lines)
+void drawPartition(Mat image, const vector<vector<Point>> &intersections,
+                   const vector<ImageLine> &hori_lines, const vector<ImageLine> &vert_lines)
 
 {
     drawLines(image, hori_lines);
