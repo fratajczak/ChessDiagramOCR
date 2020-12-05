@@ -38,6 +38,7 @@ SRC_NAME		:= main.cpp\
 				   geometry.cpp\
 				   partition.cpp\
 				   fen.cpp\
+				   normalize.cpp\
 				   predict.cpp\
 				   draw.cpp
 SRC             := $(addprefix $(SRC_PATH)/,$(SRC_NAME))
